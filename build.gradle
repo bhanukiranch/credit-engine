@@ -1,0 +1,68 @@
+plugins {
+    id 'org.springframework.boot' version '2.2.0.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+    id "org.asciidoctor.convert" version "2.3.0"
+}
+
+
+group = 'com.credit.engine'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('snippetsDir', file('build/generated-snippets'))
+    set('asciiDocOutputDir', file('build/generated-doc'))
+}
+
+asciidoctorj {
+    version = '2.3.0'
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-security'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.boot:spring-boot-starter-data-rest'
+    compile 'org.springframework.boot:spring-boot-starter-integration'
+    compile 'org.springframework.integration:spring-integration-file'
+    compile 'org.springframework.integration:spring-integration-http'
+    compile 'org.springframework.integration:spring-integration-jpa'
+    compile "org.springframework.boot:spring-boot-starter-tomcat"
+    runtime "com.h2database:h2"
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+    asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
+}
+
+test {
+    useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    logger.lifecycle("Processing from $snippetsDir to $asciiDocOutputDir")
+
+    inputs.dir snippetsDir
+    dependsOn test
+    backends = ['html5']
+    attributes = [
+            sourceDir: snippetsDir,
+            doctype: 'book',
+            toc: 'left',
+            toclevels: '3',
+            numbered: '3',
+            sectlinks: '',
+            sectanchors: '',
+            hardbreaks: '',
+    ]
+}
